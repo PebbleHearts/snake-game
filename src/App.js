@@ -70,16 +70,15 @@ const gameStateReducer = (state, action) => {
     case actionTypes.MOVE_SNAKE: {
       const newHead = getNextHead(state);
       const movedSnake = [...state.snake, newHead];
-      movedSnake.shift();
-      return { ...state, snake: movedSnake };
+      const lastTailBlock = movedSnake.shift();
+      return { ...state, snake: movedSnake, lastTailBlock };
     }
     case actionTypes.CHANGE_DIRECTION: {
       const canChangeDirection = possibleDirectionChanges[state.direction].includes(action.payload)
       return canChangeDirection ? { ...state, direction: action.payload } : state;
     }
     case actionTypes.EAT_FOOD: {
-      const newHead = getNextHead(state);
-      const snakeWithEatenFood = [...state.snake, newHead];
+      const snakeWithEatenFood = [state.lastTailBlock ,...state.snake];
       return { ...state, snake: snakeWithEatenFood, food: getRandomCanvasCoordinate(), score: state.score + 1 }
     }
     case actionTypes.GAME_OVER:
@@ -95,6 +94,7 @@ const initialState = {
   gameStarted: false,
   isGameOver: false,
   snake: [[0, 0], [2, 0]],
+  lastTailBlock: null,
   food: getRandomCanvasCoordinate(),
   direction: directionTypes.RIGHT,
   score: 0
